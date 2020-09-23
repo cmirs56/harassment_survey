@@ -15,7 +15,7 @@ read.csv.any <- function(text, sep = "", ...) {
   result <- read.table(text, sep = separate[[setting]], fileEncoding = encoding, ...)
   return(result)
 }
-df <- read.csv.any("c:/Users/MC/R/harassment/harassment_raw.csv", header = TRUE, na.strings = c("NA", ""))
+df <- read.csv.any("c:/Users/MC/R/harassment_survey/harassment_raw.csv", header = TRUE, na.strings = c("NA", ""))
 df
 
 str(df)
@@ -108,6 +108,8 @@ t.test(harassment ~ join,
        var.equal = FALSE,
        conf.level = 0.95)               #p-value = 0.1412, H0 
 
+
+
 # Wilcoxon rank sum test (혹은 Mann-Whitney U-test)_nonparametric test 
 
 wilcox.test(harassment ~ join, 
@@ -163,3 +165,80 @@ wilcox.test(perception ~ gender,
             conf.level = 0.95)        #p-value = 0.4086, H0
 
 
+# harassment_factor > 3  -------------------------------------------------------------
+
+kruskal.test(harassment ~ factor(age), data = df)
+kruskal.test(harassment ~ factor(position), data = df)
+kruskal.test(harassment ~ factor(duty), data = df)
+kruskal.test(harassment ~ factor(affiliate), data = df)
+kruskal.test(harassment ~ factor(seniority), data = df)
+kruskal.test(harassment ~ factor(job), data = df)
+kruskal.test(harassment ~ factor(location), data = df)
+
+library(userfriendlyscience)
+posthocTGH(df$position, y = df$harassment, method = 'games-howell')
+posthocTGH(df$seniority, y = df$harassment, method = 'games-howell')
+
+
+# perception_factor > 3 ---------------------------------------------------
+
+kruskal.test(perception ~ factor(age), data = df)
+kruskal.test(perception ~ factor(position), data = df)
+kruskal.test(perception ~ factor(duty), data = df)
+kruskal.test(perception ~ factor(affiliate), data = df)
+kruskal.test(perception ~ factor(seniority), data = df)
+kruskal.test(perception ~ factor(job), data = df)
+kruskal.test(perception ~ factor(location), data = df)
+
+posthocTGH(df$seniority, y = df$perception, method = 'games-howell')
+posthocTGH(df$job, y = df$perception, method = 'games-howell')
+posthocTGH(df$location, y = df$perception, method = 'games-howell')
+
+
+# monnBook  ---------------------------------------------------------------
+
+library(moonBook)
+mytable(df)
+
+df$position <- as.factor(df$position)
+df$seniority <- as.factor(df$seniority)
+df$job <- as.factor(df$job)
+df$location <- as.factor(df$location)
+
+str(df)
+
+mytable(job ~ harassment, data = df)
+mytable(reason ~ harassment, data = df)
+
+
+# chart -------------------------------------------------------------------
+
+ggplot(df, aes(location, harassment))+
+  geom_point(mapping = aes(shape = seniority, color = job))+
+  geom_boxplot()+
+  theme_bw()
+
+ggplot(df, aes(location, harassment))+
+  geom_point(mapping = aes(color = job))+
+  geom_boxplot()+
+  theme_bw()
+
+ggplot(df, aes(position, harassment))+
+  geom_point(mapping = aes(color = seniority))+
+  geom_boxplot()+
+  theme_bw()
+
+ggplot(df, aes(seniority, harassment))+
+  geom_point(mapping = aes(color = position))+
+  geom_boxplot()+
+  theme_bw()
+
+ggplot(df, aes(relation, harassment))+
+  geom_point(mapping = aes(color = position))+
+  geom_boxplot()+
+  theme_bw()
+
+ggplot(df, aes(location, harassment))+
+  geom_point(mapping = aes(color = relation))+
+  geom_boxplot()+
+  theme_bw()
